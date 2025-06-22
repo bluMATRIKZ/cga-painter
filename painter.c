@@ -71,7 +71,7 @@ int main() {
     char pixels[MAX_HEIGHT][MAX_WIDTH];
     for (int y = 0; y < height; ++y)
         for (int x = 0; x < width; ++x)
-            pixels[y][x] = '8'; // white
+            pixels[y][x] = '8';
 
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window* win = SDL_CreateWindow("Computer Graphics Array Painter",
@@ -88,25 +88,39 @@ int main() {
 
     int brush = 1;
     int running = 1;
+    int mouse_down_left = 0;
+    int mouse_down_right = 0;
     save_cga_file(pixels, width, height, filename);
 
     while (running) {
         SDL_Event e;
         while (SDL_PollEvent(&e)) {
-            if (e.type == SDL_QUIT) running = 0;
+            if (e.type == SDL_QUIT)
+                running = 0;
+
             if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym >= SDLK_1 && e.key.keysym.sym <= SDLK_8)
                     brush = e.key.keysym.sym - SDLK_0;
             }
+
             if (e.type == SDL_MOUSEBUTTONDOWN) {
-                int mx = e.button.x;
-                int my = e.button.y;
+                if (e.button.button == SDL_BUTTON_LEFT) mouse_down_left = 1;
+                if (e.button.button == SDL_BUTTON_RIGHT) mouse_down_right = 1;
+            }
+            if (e.type == SDL_MOUSEBUTTONUP) {
+                if (e.button.button == SDL_BUTTON_LEFT) mouse_down_left = 0;
+                if (e.button.button == SDL_BUTTON_RIGHT) mouse_down_right = 0;
+            }
+
+            if (e.type == SDL_MOUSEMOTION || e.type == SDL_MOUSEBUTTONDOWN) {
+                int mx = (e.type == SDL_MOUSEMOTION) ? e.motion.x : e.button.x;
+                int my = (e.type == SDL_MOUSEMOTION) ? e.motion.y : e.button.y;
                 int cx = (mx - offsetX) / zoom;
                 int cy = (my - offsetY) / zoom;
                 if (cx >= 0 && cx < width && cy >= 0 && cy < height) {
-                    if (e.button.button == SDL_BUTTON_LEFT)
+                    if (mouse_down_left)
                         pixels[cy][cx] = '0' + brush;
-                    else if (e.button.button == SDL_BUTTON_RIGHT)
+                    else if (mouse_down_right)
                         pixels[cy][cx] = '8';
                     save_cga_file(pixels, width, height, filename);
                 }
@@ -115,7 +129,7 @@ int main() {
 
         SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
         SDL_RenderClear(ren);
-        
+
         SDL_Color bc = palette[brush - 1];
         SDL_SetRenderDrawColor(ren, bc.r, bc.g, bc.b, 255);
         SDL_Rect border = {offsetX - 1, offsetY - 1, canvasW + 2, canvasH + 2};
