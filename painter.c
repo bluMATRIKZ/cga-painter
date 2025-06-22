@@ -60,8 +60,12 @@ int main() {
     scanf("%d", &width);
     printf("Enter canvas height (max %d): ", MAX_HEIGHT);
     scanf("%d", &height);
-    printf("Enter output filename (e.g., art.cga): ");
+    printf("Enter output filename (e.g., art): ");
     scanf("%s", filename);
+
+    if (strlen(filename) < 4 || strcmp(filename + strlen(filename) - 4, ".cga") != 0) {
+        strcat(filename, ".cga");
+    }
 
     if (width <= 0 || height <= 0 || width > MAX_WIDTH || height > MAX_HEIGHT) {
         printf("Invalid size.\n");
@@ -87,9 +91,9 @@ int main() {
     int offsetY = (WINDOW_HEIGHT - canvasH) / 2;
 
     int brush = 1;
-    int running = 1;
     int mouse_down_left = 0;
     int mouse_down_right = 0;
+    int running = 1;
     save_cga_file(pixels, width, height, filename);
 
     while (running) {
