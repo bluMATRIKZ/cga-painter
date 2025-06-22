@@ -113,8 +113,7 @@ int main() {
 
         SDL_SetRenderDrawColor(ren, 255, 255, 255, 255);
         SDL_RenderClear(ren);
-
-        // Border preview
+        
         SDL_Color bc = palette[brush - 1];
         SDL_SetRenderDrawColor(ren, bc.r, bc.g, bc.b, 255);
         SDL_Rect border = {offsetX - 1, offsetY - 1, canvasW + 2, canvasH + 2};
